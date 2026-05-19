@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NVL Diagnostic">
+<meta name="theme-color" content="#F4F6FF">
+<title>NextVia Labs — Diagnóstico Operacional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ── EXACT SITE TOKENS ── */
+:root {
+  --bg:       #F4F6FF;
+  --bg-card:  #FFFFFF;
+  --bg-card2: #ECEEFF;
+  --text:     #0D0D2B;
+  --muted:    #5C5C82;
+  --border:   rgba(0,0,0,0.09);
+  --border-p: rgba(123,47,247,0.3);
+  --grad:     linear-gradient(135deg, #00C2FF 0%, #7B2FF7 50%, #FF1A8C 100%);
+  --grad-t:   linear-gradient(135deg, #0088BB 0%, #6B1FD7 50%, #BB005A 100%);
+  --c1: #00C2FF; --c2: #7B2FF7; --c3: #FF1A8C;
+  --red: #FF5555; --green: #00C87A; --amber: #F59E0B;
+  --pa: #FF5555; --pb: #F59E0B; --pc: #0088BB; --pd: #00C87A;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg); color: var(--text);
+  line-height: 1.6; overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ── LAYOUT ── */
+.wrap { max-width: 640px; margin: 0 auto; min-height: 100vh; }
+
+/* ── HEADER ── */
+.hband {
+  background: rgba(244,246,255,0.93);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: .65rem 1.1rem;
+  display: flex; justify-content: space-between; align-items: center;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 1px 20px rgba(0,0,0,.06);
+}
+.logo-row { display: flex; align-items: center; gap: .55rem; }
+.grad-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--grad); flex-shrink: 0; }
+.logo-name { font-size: 15px; font-weight: 900; color: var(--text); letter-spacing: -.3px; }
+.logo-sub  { font-size: 9px; color: var(--muted); letter-spacing: .4px; margin-top: 1px; }
+.hright { display: flex; align-items: center; gap: .45rem; }
+.lang-toggle {
+  background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: 22px; padding: 3px; display: flex; gap: 2px;
+}
+.lang-btn {
+  padding: 5px 13px; border-radius: 18px; border: none;
+  background: transparent; color: var(--muted);
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  transition: all .2s; font-family: 'Inter', sans-serif; letter-spacing: .3px;
+}
+.lang-btn.on { background: var(--grad); color: #fff; }
+.lock-btn {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  width: 28px; height: 28px; border-radius: 8px; cursor: pointer;
+  font-size: 12px; display: flex; align-items: center; justify-content: center;
+  transition: all .18s;
+}
+.lock-btn:hover, .lock-btn.on { border-color: var(--border-p); color: var(--c2); }
+
+/* ── BODY ── */
+.body { padding: 1.1rem; }
+
+/* ── PROGRESS ── */
+.prog { display: flex; gap: 4px; margin-bottom: 1.4rem; }
+.ps { flex: 1; height: 3px; border-radius: 2px; background: #ECEEFF; transition: background .4s; }
+.ps.on { background: var(--grad); }
+
+/* ── SECTION TAG ── */
+.sh {
+  font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+  background: var(--grad-t); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; display: block; margin-bottom: .85rem;
+}
+
+/* ── BADGE ── */
+.badge {
+  display: inline-flex; align-items: center; gap: .45rem;
+  background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: 22px; padding: 5px 13px;
+  font-size: 11px; color: var(--muted); margin-bottom: 1.1rem;
+  font-weight: 500;
+}
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--grad); flex-shrink: 0; }
+
+/* ── FIELDS ── */
+.fl { margin-bottom: .8rem; }
+.flbl { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: .28rem; display: block; }
+.inp {
+  width: 100%; background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 10px; padding: .58rem .85rem; color: var(--text);
+  font-size: 13px; font-family: 'Inter', sans-serif; outline: none;
+  transition: border .2s, box-shadow .2s; caret-color: var(--c2);
+  -webkit-appearance: none;
+}
+.inp:focus { border-color: var(--border-p); box-shadow: 0 0 0 3px rgba(123,47,247,.08); }
+
+/* ── VERTICAL GRID ── */
+.vgrid { display: grid; grid-template-columns: repeat(5,1fr); gap: .4rem; margin-bottom: .9rem; }
+.vcard {
+  position: relative; border-radius: 11px; overflow: hidden; cursor: pointer;
+  aspect-ratio: 3/4; border: 2px solid transparent;
+  transition: all .2s; box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.vcard:active { transform: scale(.97); }
+.vcard.sel { border-color: var(--c2); box-shadow: 0 0 0 3px rgba(123,47,247,.15); }
+.vcard img { width: 100%; height: 100%; object-fit: cover; filter: brightness(.42); transition: filter .2s; display: block; }
+.vcard.sel img { filter: brightness(.52); }
+.vcard-over {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: .45rem .3rem;
+  background: linear-gradient(to top, rgba(13,13,43,.88) 0%, transparent 60%);
+}
+.vcard-lbl { font-size: 8.5px; font-weight: 700; color: rgba(255,255,255,.88); text-align: center; line-height: 1.2; }
+.vcard.sel .vcard-lbl { color: #fff; }
+.vcheck {
+  position: absolute; top: 4px; right: 4px; width: 16px; height: 16px;
+  border-radius: 50%; background: var(--grad);
+  display: none; align-items: center; justify-content: center;
+}
+.vcard.sel .vcheck { display: flex; }
+.vcheck svg { display: block; }
+
+/* ── BUTTONS ── */
+.btn-grad {
+  width: 100%; background: var(--grad); color: #fff; border: none;
+  border-radius: 10px; padding: .72rem 1rem; font-size: 13px; font-weight: 700;
+  letter-spacing: .3px; cursor: pointer; transition: opacity .2s, transform .2s;
+  font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: .45rem;
+  -webkit-appearance: none;
+}
+.btn-grad:active { opacity: .85; transform: scale(.98); }
+.btn-sec {
+  width: 100%; background: var(--bg-card); border: 1px solid var(--border);
+  color: var(--text); border-radius: 10px; padding: .6rem 1rem;
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: all .18s;
+  font-family: 'Inter', sans-serif; margin-top: .45rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06); -webkit-appearance: none;
+}
+.btn-sec:active { background: var(--bg-card2); border-color: var(--border-p); }
+
+/* ── QUESTION CARD ── */
+.qc {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 14px; padding: .85rem .95rem; margin-bottom: .5rem;
+  transition: all .2s; box-shadow: 0 1px 6px rgba(0,0,0,.04);
+}
+.qc.done { border-color: rgba(123,47,247,.28); background: var(--bg-card2); }
+.qmeta { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: .3rem; }
+.qt { font-size: 13px; color: var(--text); line-height: 1.45; font-weight: 500; margin-bottom: .7rem; }
+.opts { display: grid; grid-template-columns: repeat(2,1fr); gap: .28rem; }
+.opt {
+  display: flex; align-items: center; gap: .38rem;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: .38rem .55rem; cursor: pointer;
+  font-size: 11px; font-weight: 500; color: var(--muted);
+  transition: all .14s; user-select: none; -webkit-user-select: none;
+}
+.opt.sel { background: rgba(123,47,247,.08); border-color: var(--c2); color: #6B1FD7; font-weight: 700; }
+.opt input { accent-color: var(--c2); width: 11px; height: 11px; flex-shrink: 0; }
+
+/* ── NAV ROW ── */
+.nr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; }
+.back { background: none; border: none; color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; font-family: 'Inter', sans-serif; }
+.cnt  { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+/* ── EXPRESS RESULT ── */
+.er-box {
+  background: var(--bg-card); border: 1px solid rgba(123,47,247,.22);
+  border-radius: 16px; padding: 1.15rem 1.3rem; margin-top: 1rem;
+  box-shadow: 0 4px 20px rgba(123,47,247,.08);
+}
+.er-micro {
+  font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+  background: var(--grad-t); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; display: block; margin-bottom: .38rem;
+}
+.er-title { font-size: 19px; font-weight: 900; color: var(--text); line-height: 1.22; margin-bottom: .55rem; letter-spacing: -.4px; }
+.er-sub { font-size: 12px; color: var(--muted); margin-bottom: .9rem; line-height: 1.5; font-weight: 500; }
+
+/* ── SCORE ── */
+.srow { display: grid; grid-template-columns: repeat(3,1fr); gap: .45rem; margin-bottom: .7rem; }
+.sc { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: .7rem .9rem; box-shadow: 0 1px 6px rgba(0,0,0,.04); }
+.slbl { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: .2rem; }
+.sval { font-size: 24px; font-weight: 900; letter-spacing: -1px; background: var(--grad-t); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.bar-bg { height: 5px; background: #ECEEFF; border-radius: 3px; margin: .3rem 0 .8rem; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; background: var(--grad); transition: width 1s ease; }
+
+/* ── CONSTRAINT BOX ── */
+.cbox { border-radius: 0 12px 12px 0; padding: .95rem 1.05rem; margin-bottom: .95rem; }
+.c-sub { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: .28rem; }
+.c-title { font-size: 18px; font-weight: 900; color: var(--text); line-height: 1.22; margin-bottom: .45rem; letter-spacing: -.4px; }
+.c-action { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: .38rem; font-weight: 500; }
+.c-tool { font-size: 11px; color: var(--muted); font-weight: 600; }
+.c-tool span { color: var(--c2); }
+
+/* ── STEPS ── */
+.stepsblock { background: var(--text); border-radius: 14px; padding: .95rem 1rem; margin-bottom: 1.1rem; }
+.stp { display: flex; gap: .7rem; margin-bottom: .7rem; align-items: flex-start; }
+.stp:last-child { margin-bottom: 0; }
+.snum { width: 21px; height: 21px; border-radius: 50%; background: var(--grad); color: #fff; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.stxt { font-size: 12px; color: rgba(244,246,255,.8); line-height: 1.5; font-weight: 500; }
+
+/* ── PILLS ── */
+.pill { display: inline-block; padding: .18rem .5rem; border-radius: 20px; font-size: 10px; font-weight: 700; margin: .15rem .08rem 0 0; letter-spacing: .3px; }
+.pill-ok { background: rgba(0,200,122,.1); color: var(--green); border: 1px solid rgba(0,200,122,.25); }
+.pill-no { background: rgba(255,85,85,.08); color: var(--red); border: 1px solid rgba(255,85,85,.2); }
+
+/* ── CONSULTANT ── */
+.cpanel { background: rgba(123,47,247,.05); border: 1px solid rgba(123,47,247,.2); border-radius: 13px; padding: .85rem; margin-bottom: 1.1rem; }
+.ctag { font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--c2); }
+.pgrid { display: grid; grid-template-columns: repeat(2,1fr); gap: .38rem; margin-top: .6rem; }
+.pcard { background: var(--bg-card); border: 1px solid var(--border); border-radius: 9px; padding: .5rem .7rem; }
+
+/* ── RESTORE ── */
+.restore {
+  background: rgba(123,47,247,.05); border: 1px solid rgba(123,47,247,.15);
+  border-radius: 11px; padding: .6rem .9rem; margin-bottom: .9rem;
+  display: flex; justify-content: space-between; align-items: center; gap: .5rem;
+}
+.rtxt { font-size: 12px; color: #6B1FD7; font-weight: 600; }
+.rbtns { display: flex; gap: .38rem; flex-shrink: 0; }
+.rbtn { background: var(--grad); color: #fff; border: none; border-radius: 7px; padding: .28rem .65rem; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+.rbtn.g { background: none; border: 1px solid var(--border); color: var(--muted); }
+
+/* ── MODAL OVERLAY ── */
+.mbg { position: fixed; inset: 0; background: rgba(13,13,43,.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 200; }
+.modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 1.5rem; width: 88%; max-width: 300px; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+.modal-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 1rem; letter-spacing: -.3px; }
+.pin-inp { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: .65rem; color: var(--text); font-size: 24px; text-align: center; letter-spacing: .5em; outline: none; margin-bottom: .85rem; font-family: 'Inter', sans-serif; -webkit-appearance: none; }
+.pin-inp:focus { border-color: var(--border-p); box-shadow: 0 0 0 3px rgba(123,47,247,.08); }
+.frow { display: flex; gap: .45rem; }
+
+/* ── RESULTS HERO ── */
+.res-hero { border-radius: 16px; overflow: hidden; margin-bottom: 1rem; position: relative; height: 120px; box-shadow: 0 4px 20px rgba(0,0,0,.12); }
+.res-hero img { width: 100%; height: 100%; object-fit: cover; filter: brightness(.28); display: block; }
+.res-hero-over {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(0,194,255,.15) 0%, rgba(123,47,247,.3) 50%, rgba(255,26,140,.15) 100%);
+  padding: .9rem 1.1rem; display: flex; flex-direction: column; justify-content: flex-end;
+}
+.res-biz { font-size: 16px; font-weight: 900; color: #fff; letter-spacing: -.4px; }
+.res-sub { font-size: 10px; color: rgba(255,255,255,.62); margin-top: .12rem; font-weight: 600; }
+
+/* ── CHIP ── */
+.chip { display: inline-block; padding: .24rem .8rem; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: .3px; }
+
+/* ── PRINT NOTE ── */
+.print-note { font-size: 10px; color: var(--muted); text-align: center; margin-top: .5rem; font-weight: 500; }
+
+/* ── HIDDEN ── */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="hband">
+    <div class="logo-row">
+      <div class="grad-dot"></div>
+      <div>
+        <div class="logo-name">NextVia Labs</div>
+        <div class="logo-sub" id="logoSub">Diagnóstico Operacional · v5.0</div>
+      </div>
+    </div>
+    <div class="hright">
+      <div class="lang-toggle">
+        <button class="lang-btn on" id="btnES" onclick="setLang('es')">ES</button>
+        <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
+      </div>
+      <button class="lock-btn" id="lockBtn" onclick="toggleLock()">🔒</button>
+    </div>
+  </div>
+
+  <!-- PIN MODAL -->
+  <div class="mbg hidden" id="pinModal">
+    <div class="modal">
+      <div class="modal-title" id="pinTitle">Acceso Consultor</div>
+      <input class="pin-inp" type="password" maxlength="4" placeholder="••••" id="pinInput" oninput="checkPin()" onkeypress="if(event.key==='Enter')submitPin()">
+      <div class="frow">
+        <button class="btn-grad" style="flex:1;padding:.6rem 1rem" onclick="submitPin()" id="pinEnter">Entrar</button>
+        <button class="btn-sec" style="margin:0;width:auto;padding:.6rem 1rem" onclick="closePin()" id="pinCancel">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- RESTORE BANNER -->
+    <div class="restore hidden" id="restoreBanner">
+      <span class="rtxt" id="restoreText">Sesión guardada encontrada</span>
+      <div class="rbtns">
+        <button class="rbtn" id="restoreBtn" onclick="restoreSession()">Continuar</button>
+        <button class="rbtn g" id="discardBtn" onclick="discardSession()">Descartar</button>
+      </div>
+    </div>
+
+    <!-- CONSULTANT PANEL -->
+    <div class="cpanel hidden" id="consultPanel">
+      <div style="display:flex;justify-content:space-between;cursor:pointer" onclick="togglePlanRef()">
+        <span class="ctag" id="planRefLabel">Referencia de Planes</span>
+        <span id="planRefArrow" style="color:var(--c2);font-size:11px;font-weight:700">▼</span>
+      </div>
+      <div class="pgrid hidden" id="planRefGrid"></div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="prog hidden" id="progressBar">
+      <div class="ps" id="p0"></div>
+      <div class="ps" id="p1"></div>
+      <div class="ps" id="p2"></div>
+    </div>
+
+    <!-- ── SETUP ── -->
+    <div id="stageSetup">
+      <div class="badge"><div class="badge-dot"></div><span id="badgeText">Charlotte, NC · Diagnóstico Operacional</span></div>
+      <span class="sh" id="shSetup">Nueva sesión</span>
+      <div class="fl">
+        <label class="flbl" id="lblClient">Nombre del cliente</label>
+        <input class="inp" id="clientName" placeholder="Ej. Juan Pérez" oninput="autoSave()">
+      </div>
+      <div class="fl">
+        <label class="flbl" id="lblBiz">Nombre del negocio</label>
+        <input class="inp" id="bizName" placeholder="Ej. Barbería El Barrio" oninput="autoSave()">
+      </div>
+      <div class="fl">
+        <label class="flbl" id="lblVertical">Selecciona tu industria</label>
+        <div class="vgrid" id="vgrid"></div>
+      </div>
+      <div class="fl">
+        <label class="flbl" id="lblDate">Fecha</label>
+        <input class="inp" type="date" id="sessionDate" oninput="autoSave()">
+      </div>
+      <button class="btn-grad" id="startBtn" onclick="startExpress()">Iniciar diagnóstico →</button>
+    </div>
+
+    <!-- ── EXPRESS ── -->
+    <div id="stageExpress" class="hidden">
+      <div class="nr">
+        <button class="back" onclick="goTo('setup')">← <span id="backExpress">Volver</span></button>
+        <span class="cnt" id="cntExpress">0 / 7</span>
+      </div>
+      <span class="sh" id="shExpress">Diagnóstico Express — 7 preguntas</span>
+      <div id="expressQs"></div>
+      <button class="btn-grad" id="calcExpressBtn" onclick="calcExpress()">Identificar restricción principal</button>
+      <div id="expressResult" class="hidden">
+        <div class="er-box" id="erBox">
+          <span class="er-micro" id="erMicro">La restricción que frena tu negocio</span>
+          <div class="er-title" id="erTitle"></div>
+          <div class="er-sub" id="erSub"></div>
+          <button class="btn-grad" id="fullDiagBtn" onclick="goTo('diagnostic')">Continuar al diagnóstico completo →</button>
+        </div>
+        <div class="cpanel hidden" id="consultExpress" style="margin-top:.9rem">
+          <p class="ctag" id="consultExpressLabel">Vista Consultor</p>
+          <p style="font-size:12px;color:var(--muted);font-weight:600;margin-top:.4rem" id="consultExpressText"></p>
+        </div>
+      </div>
+      <button class="btn-sec" id="restartExpress" onclick="confirmReset()">Reiniciar</button>
+    </div>
+
+    <!-- ── DIAGNOSTIC ── -->
+    <div id="stageDiagnostic" class="hidden">
+      <div class="nr">
+        <button class="back" onclick="goTo('express')">← <span id="backDiag">Volver</span></button>
+        <span class="cnt" id="cntDiag">0 / 12</span>
+      </div>
+      <span class="sh" id="shDiag">Diagnóstico completo</span>
+      <div id="diagQs"></div>
+      <button class="btn-grad" id="calcDiagBtn" onclick="calcDiag()">Calcular diagnóstico</button>
+      <button class="btn-sec" id="restartDiag" onclick="confirmReset()">Reiniciar</button>
+    </div>
+
+    <!-- ── RESULTS ── -->
+    <div id="stageResults" class="hidden">
+      <div class="res-hero" id="resHero">
+        <img id="resImg" src="" alt="">
+        <div class="res-hero-over">
+          <div class="res-biz" id="resBiz"></div>
+          <div class="res-sub" id="resSub"></div>
+        </div>
+      </div>
+      <span class="sh" id="shScore">Resultado</span>
+      <div class="srow">
+        <div class="sc"><div class="slbl" id="lblPts">Puntos</div><div class="sval" id="valPts"></div></div>
+        <div class="sc"><div class="slbl" id="lblMax">Máximo</div><div class="sval" id="valMax"></div></div>
+        <div class="sc"><div class="slbl" id="lblLvl">Nivel</div><div class="sval" id="valPct"></div></div>
+      </div>
+      <div class="bar-bg"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:1.1rem">
+        <span class="chip" id="stageChip"></span>
+        <span id="forcedWarning" class="hidden" style="font-size:11px;color:var(--amber);font-weight:700"></span>
+      </div>
+      <span class="sh" id="shConstraint">Restricción Principal</span>
+      <div class="cbox" id="cbox">
+        <div class="c-sub" id="cSub"></div>
+        <div class="c-title" id="cTitle"></div>
+        <div class="c-action" id="cAction"></div>
+        <div class="c-tool" id="cTool"></div>
+      </div>
+      <div class="cpanel hidden" id="consultResults">
+        <p class="ctag" id="consultResultsLabel">Vista Consultor</p>
+        <p style="font-size:11px;color:var(--muted);margin:.4rem 0 .22rem;font-weight:600" id="consultFocusLabel">Enfoque interno</p>
+        <p style="font-size:12px;color:var(--text);font-weight:500;margin-bottom:.55rem" id="consultFocus"></p>
+        <div id="consultPills"></div>
+      </div>
+      <span class="sh" id="shSteps" style="margin-top:.9rem">Próximos Pasos</span>
+      <div class="stepsblock" id="stepsBlock"></div>
+      <div class="frow">
+        <button class="btn-grad" style="flex:1" id="downloadBtn" onclick="downloadReport()">Descargar reporte</button>
+        <button class="btn-sec" style="margin:0;width:auto;padding:.7rem .9rem" id="newBtn" onclick="confirmReset()">Nueva</button>
+      </div>
+      <div class="print-note" id="printNote">Abre el HTML en tu navegador → Imprimir → Guardar como PDF.</div>
+    </div>
+
+  </div><!-- /body -->
+</div><!-- /wrap -->
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────
+const VIMG = {
+  BAR:  'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80&fit=crop',
+  SAL:  'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80&fit=crop',
+  THAI: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=600&q=80&fit=crop',
+  FOOD: 'https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?w=600&q=80&fit=crop',
+  TINT: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&fit=crop',
+};
+const PCOL = { A:'#FF5555', B:'#F59E0B', C:'#0088BB', D:'#00C87A' };
+const PIN = '1234';
+const SK  = 'nvl_v5';
+
+const L = {
+  es: {
+    logoSub:'Diagnóstico Operacional · v5.0', badge:'Charlotte, NC · Diagnóstico TOC',
+    shSetup:'Nueva sesión', lblClient:'Nombre del cliente', clientPh:'Ej. Juan Pérez',
+    lblBiz:'Nombre del negocio', bizPh:'Ej. Barbería El Barrio',
+    lblVertical:'Selecciona tu industria', lblDate:'Fecha',
+    startBtn:'Iniciar diagnóstico →', fillAll:'Completa todos los campos.',
+    back:'Volver', shExpress:'Diagnóstico Express — 7 preguntas',
+    calcExpress:'Identificar restricción principal',
+    erMicro:'La restricción que frena tu negocio',
+    noSecondary:'El diagnóstico completo revelará las restricciones secundarias.',
+    alsoDetected:'También detectamos:',
+    fullDiag:'Continuar al diagnóstico completo →',
+    shDiag:'', calcDiag:'Calcular diagnóstico',
+    restart:'Reiniciar', confirmRestart:'¿Reiniciar sesión?',
+    shScore:'Resultado', lblPts:'Puntos', lblMax:'Máximo', lblLvl:'Nivel',
+    shConstraint:'Restricción Principal', shSteps:'Próximos Pasos',
+    step2:'Agendar sesión de implementación con NextVia Labs.',
+    step3:'Medir impacto en 30 días con las métricas acordadas.',
+    download:'Descargar reporte', newBtn:'Nueva', printNote:'Abre el HTML → Imprimir → Guardar como PDF.',
+    agendaCrit:'⚠ Agenda crítica',
+    consultOnly:'Vista Consultor', internalFocus:'Enfoque interno',
+    planRef:'Referencia de Planes', planRefArrow:'▼',
+    savedSession:'Sesión guardada encontrada', continueBtn:'Continuar', discard:'Descartar',
+    pinTitle:'Acceso Consultor', enter:'Entrar', cancel:'Cancelar', pinWrong:'PIN incorrecto',
+    s1:'Etapa 1: Orden', s2:'Etapa 2: Estabilidad', s3:'Etapa 3: Sistema', s4:'Etapa 4: Escala',
+    pnA:'Plan A — Caos Operativo', pnB:'Plan B — Inestable', pnC:'Plan C — Funcional', pnD:'Plan D — Estable',
+    pfA:'Agenda · Confirmaciones · No-show', pfB:'Recurrencia · Paquetes · Reagendado',
+    pfC:'Delegación · SOP · Scripts', pfD:'Contratación · Calidad',
+    toolLabel:'Herramienta', primaryC:'Cuello de botella identificado',
+    opts:['Nunca','A veces','Frecuente','Siempre'],
+    question:'Pregunta', weight:'Peso',
+    eqs:[
+      'Existe un sistema o agenda donde se registra todo el trabajo',
+      'Las citas o trabajos se confirman con reglas claras',
+      'Alguien más puede gestionar mensajes o coordinación',
+      'Las operaciones paran cuando el dueño no está presente',
+      'El ingreso mensual es predecible antes de que termine el mes',
+      'Los clientes regresan con una frecuencia reconocible',
+      'Existen reglas claras para crecer sin perder calidad',
+    ],
+  },
+  en: {
+    logoSub:'Operational Diagnostic · v5.0', badge:'Charlotte, NC · TOC Diagnostic',
+    shSetup:'New session', lblClient:'Client name', clientPh:'e.g. John Smith',
+    lblBiz:'Business name', bizPh:'e.g. Main Street Barbershop',
+    lblVertical:'Select your industry', lblDate:'Date',
+    startBtn:'Start diagnostic →', fillAll:'Please fill in all fields.',
+    back:'Back', shExpress:'Express Diagnostic — 7 questions',
+    calcExpress:'Identify primary constraint',
+    erMicro:'What is holding your business back',
+    noSecondary:'The full diagnostic will reveal secondary constraints.',
+    alsoDetected:'Also detected:',
+    fullDiag:'Continue to full diagnostic →',
+    shDiag:'', calcDiag:'Calculate diagnostic',
+    restart:'Restart', confirmRestart:'Restart session?',
+    shScore:'Result', lblPts:'Points', lblMax:'Maximum', lblLvl:'Level',
+    shConstraint:'Primary Constraint', shSteps:'Next Steps',
+    step2:'Schedule an implementation session with NextVia Labs.',
+    step3:'Measure impact in 30 days with agreed metrics.',
+    download:'Download report', newBtn:'New', printNote:'Open HTML → Print → Save as PDF.',
+    agendaCrit:'⚠ Critical scheduling gap',
+    consultOnly:'Consultant View', internalFocus:'Internal focus',
+    planRef:'Plan Reference', planRefArrow:'▼',
+    savedSession:'Saved session found', continueBtn:'Continue', discard:'Discard',
+    pinTitle:'Consultant Access', enter:'Enter', cancel:'Cancel', pinWrong:'Incorrect PIN',
+    s1:'Stage 1: Order', s2:'Stage 2: Stability', s3:'Stage 3: System', s4:'Stage 4: Scale',
+    pnA:'Plan A — Chaos', pnB:'Plan B — Unstable', pnC:'Plan C — Functional', pnD:'Plan D — Stable',
+    pfA:'Schedule · Confirmations · No-show', pfB:'Recurrence · Packages · Rebooking',
+    pfC:'Delegation · SOP · Scripts', pfD:'Hiring · Quality',
+    toolLabel:'Tool', primaryC:'Bottleneck identified',
+    opts:['Never','Sometimes','Often','Always'],
+    question:'Question', weight:'Weight',
+    eqs:[
+      'There is a clear system where all work is recorded',
+      'Appointments or jobs are confirmed using clear rules',
+      'Someone else can manage messages or coordination',
+      'Daily operations stop when the owner is absent',
+      'Monthly income is predictable before the month ends',
+      'Clients return at a consistent, recognizable frequency',
+      'There are clear rules for growing without losing quality',
+    ],
+  }
+};
+
+const V = {
+  BAR:{
+    es:{name:'Barbería',label:'Barbería'},en:{name:'Barbershop',label:'Barbershop'},agendaQ:1,
+    qs:{
+      es:[{t:'Respondes mensajes de clientes el mismo día',w:2},{t:'Tienes agenda digital activa y actualizada',w:3},{t:'Confirmas citas el día anterior',w:2},{t:'Reagendas a cada cliente antes de que se vaya',w:3},{t:'Tienes política clara para no-shows',w:2},{t:'Usas recordatorios automáticos antes de cada cita',w:3},{t:'Tienes clientes recurrentes cada 2–4 semanas',w:3},{t:'Tu agenda se llena sin depender de promociones',w:2},{t:'Trabajas más horas de las que quisieras',w:2},{t:'Alguien más puede manejar la agenda si no estás',w:3},{t:'Tu ingreso mensual es predecible con una semana de anticipación',w:3},{t:'Tienes reglas claras para contratar o abrir otra silla',w:4}],
+      en:[{t:'You respond to client messages the same day',w:2},{t:'You have an active, updated digital schedule',w:3},{t:'You confirm appointments the day before',w:2},{t:'You rebook every client before they leave',w:3},{t:'You have a clear no-show policy',w:2},{t:'You use automatic reminders before each appointment',w:3},{t:'You have recurring clients who return every 2–4 weeks',w:3},{t:'Your schedule fills without constant promotions',w:2},{t:'You work more hours per week than you want',w:2},{t:'Someone else can manage the schedule if you are away',w:3},{t:'Your monthly income is predictable one week in advance',w:3},{t:'You have clear rules for hiring or opening another chair',w:4}]
+    },
+    c:{
+      es:{A:{l:'Sin control de agenda',a:'Crea una agenda digital esta semana. Sin eso, nada más funciona.',t:'Square Appointments o Fresha'},B:{l:'Clientes sin frecuencia de retorno',a:'Necesitas rebooking sistemático. Cada cliente sale con su próxima cita.',t:'WhatsApp + registro de clientes'},C:{l:'El negocio depende solo de ti',a:'Documenta el flujo de citas. Un empleado debe poder operar sin ti.',t:'SOP de agenda + Quick Replies'},D:{l:'Sin reglas para crecer',a:'Tienes operación estable. El siguiente paso es contratar o subir precios.',t:'Sistema de contratación'}},
+      en:{A:{l:'No scheduling control',a:'Create a digital schedule this week. Nothing else works without it.',t:'Square Appointments or Fresha'},B:{l:'Clients do not return consistently',a:'You need systematic rebooking. Every client leaves with their next appointment.',t:'WhatsApp + client log'},C:{l:'Business depends entirely on you',a:'Document your appointment flow. An employee must be able to operate without you.',t:'Scheduling SOP + Quick Replies'},D:{l:'No rules for growth',a:'You have a stable operation. Next step is hiring or raising prices.',t:'Hiring system'}}
+    }
+  },
+  SAL:{
+    es:{name:'Salón de Cabello',label:'Salón'},en:{name:'Hair Salon',label:'Hair Salon'},agendaQ:1,
+    qs:{
+      es:[{t:'Respondes solicitudes de cita el mismo día',w:2},{t:'Tienes agenda digital por estilista',w:3},{t:'Confirmas todas las citas el día anterior',w:2},{t:'Reagendas a cada cliente antes de que salga',w:3},{t:'Tienes política activa para no-shows',w:2},{t:'Usas recordatorios automáticos',w:3},{t:'Tienes clientes recurrentes mensuales o más frecuentes',w:3},{t:'Controlas el ingreso por estilista por día',w:3},{t:'El salón opera con orden cuando el dueño no está',w:2},{t:'Alguien más puede manejar citas y mensajes',w:3},{t:'Tu ingreso mensual es predecible antes de fin de semana',w:3},{t:'Tienes reglas claras para contratar o abrir otra sede',w:4}],
+      en:[{t:'You respond to appointment requests the same day',w:2},{t:'You have a digital schedule per stylist',w:3},{t:'You confirm all appointments the day before',w:2},{t:'You rebook every client before they leave',w:3},{t:'You have an active no-show policy',w:2},{t:'You use automatic reminders',w:3},{t:'You have recurring clients monthly or more often',w:3},{t:'You track revenue per stylist per day',w:3},{t:'The salon runs in order when the owner is not present',w:2},{t:'Someone else can handle appointments and messages',w:3},{t:'Your monthly income is predictable before the week ends',w:3},{t:'You have clear rules for hiring or opening another location',w:4}]
+    },
+    c:{
+      es:{A:{l:'Sin agenda estructurada por estilista',a:'Cada estilista necesita su propia agenda digital. El caos de horarios destruye ingresos.',t:'GlossGenius o Vagaro'},B:{l:'Sillas vacías alternadas con sobreagendamiento',a:'Necesitas reglas de distribución de citas. Llena huecos antes de abrir nuevos.',t:'CRM simple + sistema de turnos'},C:{l:'El salón depende del dueño para funcionar',a:'Documenta los procesos. Un estilista debe poder operar sin supervisión.',t:'Manual operativo + checklist diario'},D:{l:'Sin modelo para segunda sede',a:'Tienes el sistema. Estandarízalo antes de replicarlo.',t:'SOP completo + acuerdo de expansión'}},
+      en:{A:{l:'No structured schedule per stylist',a:'Each stylist needs their own digital schedule. Scheduling chaos destroys revenue.',t:'GlossGenius or Vagaro'},B:{l:'Overbooking and empty chairs alternating',a:'You need appointment distribution rules. Fill gaps before opening new slots.',t:'Simple CRM + shift system'},C:{l:'Salon depends on owner to function',a:'Document your processes. A stylist must be able to operate without constant supervision.',t:'Operations manual + daily checklist'},D:{l:'No model for a second location',a:'You have the system. Standardize it before replicating.',t:'Full SOP + expansion agreement'}}
+    }
+  },
+  THAI:{
+    es:{name:'Masajes Tailandeses',label:'Masajes'},en:{name:'Thai Massage',label:'Thai Massage'},agendaQ:1,
+    qs:{
+      es:[{t:'Respondes mensajes nuevos en menos de 30 minutos',w:2},{t:'Tienes proceso digital claro para agendar sesiones',w:3},{t:'Confirmas todas las citas el día anterior',w:2},{t:'Reagendas a cada cliente antes de terminar su sesión',w:3},{t:'Tu agenda prioriza clientes de dolor crónico',w:2},{t:'Usas recordatorios automáticos para todas las citas',w:3},{t:'Tienes clientes recurrentes con sesiones mensuales o más frecuentes',w:3},{t:'Controlas cuántas sesiones puedes hacer al día sin agotarte',w:2},{t:'Trabajas más horas físicas de las que tu cuerpo tolera',w:2},{t:'Alguien más puede responder mensajes y agendar por ti',w:3},{t:'Tu ingreso mensual es predecible con una semana de anticipación',w:3},{t:'Tienes reglas claras para contratar otro terapeuta o escalar',w:4}],
+      en:[{t:'You respond to new messages in under 30 minutes',w:2},{t:'You have a clear digital process for scheduling sessions',w:3},{t:'You confirm every appointment the day before',w:2},{t:'You rebook every client before their session ends',w:3},{t:'Your schedule prioritizes chronic pain clients',w:2},{t:'You use automatic reminders for all appointments',w:3},{t:'You have recurring clients with monthly or more frequent sessions',w:3},{t:'You track how many sessions per day you can handle without burnout',w:2},{t:'You work more physical hours than your body tolerates well',w:2},{t:'Someone else can respond to messages and schedule for you',w:3},{t:'Your monthly income is predictable one week in advance',w:3},{t:'You have clear rules for hiring another therapist or scaling',w:4}]
+    },
+    c:{
+      es:{A:{l:'Sin sistema de citas estructurado',a:'Implementa agenda digital con confirmación automática esta semana.',t:'Acuity Scheduling o MindBody'},B:{l:'Clientes sin frecuencia de retorno',a:'Cada sesión termina con la próxima agendada. Sin excepción.',t:'CRM simple + WhatsApp'},C:{l:'Agotamiento físico del terapeuta',a:'Necesitas límites de sesiones diarias y alguien que maneje mensajes.',t:'Reglas de capacidad + asistente'},D:{l:'Sin proceso para contratar otro terapeuta',a:'Tienes demanda. Te falta el proceso documentado para agregar capacidad.',t:'SOP de entrenamiento + contrato'}},
+      en:{A:{l:'No structured appointment system',a:'Implement a digital schedule with automatic confirmation this week.',t:'Acuity Scheduling or MindBody'},B:{l:'Clients without consistent return frequency',a:'Every session must end with the next one booked. No exceptions.',t:'Simple CRM + WhatsApp'},C:{l:'Therapist physical burnout',a:'You need daily session limits and someone to handle messages.',t:'Capacity rules + message assistant'},D:{l:'No process for hiring another therapist',a:'You have the demand. You need documented process to add capacity.',t:'Training SOP + contract'}}
+    }
+  },
+  FOOD:{
+    es:{name:'Food Truck',label:'Food Truck'},en:{name:'Food Truck',label:'Food Truck'},agendaQ:1,
+    qs:{
+      es:[{t:'Tienes ubicaciones y horarios fijos publicados con anticipación',w:3},{t:'Publicas tu ubicación del día antes de arrancar operaciones',w:2},{t:'Controlas el tiempo promedio de preparación por pedido',w:3},{t:'Controlas el inventario antes de cada turno',w:3},{t:'Los precios son claros, visibles y no se negocian en caja',w:2},{t:'Repites ubicaciones y eventos que ya han sido rentables',w:3},{t:'Las esperas largas no te han costado ventas visibles',w:2},{t:'No dependes de descuentos para generar ventas',w:2},{t:'Tu menú permite velocidad de servicio constante',w:3},{t:'Alguien más puede operar el truck sin que tú estés',w:3},{t:'Tu ingreso semanal es predecible antes de salir a operar',w:3},{t:'Tienes reglas claras para agregar segundo truck o ubicación',w:4}],
+      en:[{t:'You have fixed locations and hours published in advance',w:3},{t:'You post your daily location before starting operations',w:2},{t:'You track average preparation time per order',w:3},{t:'You check inventory before each operating shift',w:3},{t:'Prices are clear, visible, and not negotiated at the window',w:2},{t:'You repeat locations and events that have already been profitable',w:3},{t:'Long lines have not cost you visible sales',w:2},{t:'You do not rely on discounts to generate sales',w:2},{t:'Your menu allows for consistent service speed',w:3},{t:'Someone else can operate the truck without you present',w:3},{t:'Your weekly income is predictable before you go out to operate',w:3},{t:'You have clear rules for adding a second truck or location',w:4}]
+    },
+    c:{
+      es:{A:{l:'Sin ubicación ni horario predecible',a:'Define 3 ubicaciones fijas y publica el horario semanal. Sin eso no hay clientela recurrente.',t:'Google Maps + Instagram Stories'},B:{l:'Ingresos impredecibles semana a semana',a:'Necesitas eventos recurrentes y al menos un cliente corporativo fijo.',t:'Calendario de eventos + Square'},C:{l:'El truck para sin el dueño',a:'Documenta el proceso de preparación. Un empleado debe poder operar sin ti.',t:'SOP de cocina + checklist de turno'},D:{l:'Sin modelo para segundo truck',a:'El sistema actual no escala. Estandariza antes de crecer.',t:'Manual de operación completo'}},
+      en:{A:{l:'No predictable location or schedule',a:'Define 3 fixed locations and publish the weekly schedule. Without that there is no recurring clientele.',t:'Google Maps + Instagram Stories'},B:{l:'Unpredictable week-to-week income',a:'You need recurring events and at least one fixed corporate client.',t:'Event calendar + Square'},C:{l:'Truck stops without the owner',a:'Document your prep process. An employee must be able to operate without you.',t:'Kitchen SOP + shift checklist'},D:{l:'No model for a second truck',a:'Your current system does not scale. Standardize before growing.',t:'Full operations manual'}}
+    }
+  },
+  TINT:{
+    es:{name:'Auto Detailing & Tinting',label:'Detailing'},en:{name:'Auto Detailing & Tinting',label:'Detailing'},agendaQ:1,
+    qs:{
+      es:[{t:'Respondes cotizaciones y solicitudes el mismo día',w:3},{t:'Tienes precios definidos por tipo de vehículo y servicio',w:3},{t:'Explicas tipos de servicio y garantías a cada cliente',w:2},{t:'Controlas el tiempo promedio por tipo de trabajo',w:3},{t:'Rechazas o cotizas apropiadamente trabajos no rentables',w:3},{t:'Confirmas todos los trabajos antes de preparar materiales',w:2},{t:'Tienes clientes que regresan o te refieren regularmente',w:3},{t:'No dependes de descuentos para llenar tu agenda',w:2},{t:'Rara vez rehaces trabajos por errores o malentendidos',w:3},{t:'Alguien más puede instalar o asistir si tú no estás',w:3},{t:'Tu ingreso mensual es predecible antes de que termine el mes',w:3},{t:'Tienes reglas claras para contratar instaladores o escalar',w:4}],
+      en:[{t:'You respond to quotes and requests the same day',w:3},{t:'You have set prices per vehicle type and service',w:3},{t:'You explain service types and warranties to every client',w:2},{t:'You track average time per job type',w:3},{t:'You decline or properly quote jobs that are not profitable',w:3},{t:'You confirm all jobs before preparing materials',w:2},{t:'You have clients who return or refer others regularly',w:3},{t:'You do not rely on discounts to fill your schedule',w:2},{t:'You rarely redo work due to errors or misunderstandings',w:3},{t:'Someone else can install or assist if you are not available',w:3},{t:'Your monthly income is predictable before the month ends',w:3},{t:'You have clear rules for hiring installers or scaling operations',w:4}]
+    },
+    c:{
+      es:{A:{l:'Sin precios definidos por servicio',a:'Define precios por tipo de vehículo hoy. Cotizar en el momento destruye margen.',t:'Menú de precios físico y digital'},B:{l:'Clientes de una sola visita',a:'Necesitas programa de referidos activo. Un cliente satisfecho vale tres.',t:'Script de referidos + registro de clientes'},C:{l:'Solo tú puedes hacer el trabajo',a:'Si no puedes enseñar el proceso, el negocio no crece. Documenta cada instalación.',t:'SOP de instalación + entrenamiento'},D:{l:'Sin reglas para contratar instaladores',a:'Tienes la demanda. Te falta el proceso para agregar instaladores con calidad constante.',t:'Contrato de trabajo + manual técnico'}},
+      en:{A:{l:'No defined pricing by service',a:'Set prices per vehicle type today. Quoting on the spot destroys margin.',t:'Physical and digital price menu'},B:{l:'Single-visit clients only',a:'You need an active referral program. One satisfied client is worth three.',t:'Referral script + client log'},C:{l:'Only you can do the work',a:'If you cannot teach the process, the business cannot grow. Document every installation.',t:'Installation SOP + training'},D:{l:'No rules for hiring installers',a:'You have the demand. You need process to add installers with consistent quality.',t:'Work contract + technical manual'}}
+    }
+  }
+};
+
+const PLANS = (l) => ({
+  A:{allowed:['Diagnóstico + Plan de Acción'],blocked:['Automatización','CRM','Implementación','Escala'],cl:l.s1,n:l.pnA,f:l.pfA},
+  B:{allowed:['Diagnóstico','Automatización','CRM'],blocked:['Escala','Contratación'],cl:l.s2,n:l.pnB,f:l.pfB},
+  C:{allowed:['Diagnóstico','Automatización','CRM','Implementación'],blocked:['Escala'],cl:l.s3,n:l.pnC,f:l.pfC},
+  D:{allowed:['Todas las ofertas'],blocked:[],cl:l.s4,n:l.pnD,f:l.pfD},
+});
+
+// ── STATE ─────────────────────────────────────────────────────────
+let lang = 'es', stage = 'setup', consultant = false, showRef = false;
+let clientData = { clientName:'', bizName:'', vertical:'', date: todayStr() };
+let expAns = {}, expResult = null;
+let diagAns = {}, diagResult = null;
+
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('sessionDate').value = todayStr();
+  buildVGrid();
+  checkRestore();
+  renderLang();
+});
+
+// ── LANG ─────────────────────────────────────────────────────────
+function setLang(l) {
+  lang = l;
+  document.getElementById('btnES').classList.toggle('on', l==='es');
+  document.getElementById('btnEN').classList.toggle('on', l==='en');
+  renderLang();
+  if (stage === 'express') buildExpressQs();
+  if (stage === 'diagnostic') buildDiagQs();
+  autoSave();
+}
+
+function renderLang() {
+  const l = L[lang];
+  document.getElementById('logoSub').textContent = l.logoSub;
+  document.getElementById('badgeText').textContent = l.badge;
+  document.getElementById('shSetup').textContent = l.shSetup;
+  document.getElementById('lblClient').textContent = l.lblClient;
+  document.getElementById('clientName').placeholder = l.clientPh;
+  document.getElementById('lblBiz').textContent = l.lblBiz;
+  document.getElementById('bizName').placeholder = l.bizPh;
+  document.getElementById('lblVertical').textContent = l.lblVertical;
+  document.getElementById('lblDate').textContent = l.lblDate;
+  document.getElementById('startBtn').textContent = l.startBtn;
+  document.getElementById('backExpress').textContent = l.back;
+  document.getElementById('shExpress').textContent = l.shExpress;
+  document.getElementById('calcExpressBtn').textContent = l.calcExpress;
+  document.getElementById('erMicro').textContent = l.erMicro;
+  document.getElementById('fullDiagBtn').textContent = l.fullDiag;
+  document.getElementById('restartExpress').textContent = l.restart;
+  document.getElementById('backDiag').textContent = l.back;
+  document.getElementById('calcDiagBtn').textContent = l.calcDiag;
+  document.getElementById('restartDiag').textContent = l.restart;
+  document.getElementById('shScore').textContent = l.shScore;
+  document.getElementById('lblPts').textContent = l.lblPts;
+  document.getElementById('lblMax').textContent = l.lblMax;
+  document.getElementById('lblLvl').textContent = l.lblLvl;
+  document.getElementById('shConstraint').textContent = l.shConstraint;
+  document.getElementById('shSteps').textContent = l.shSteps;
+  document.getElementById('downloadBtn').textContent = l.download;
+  document.getElementById('newBtn').textContent = l.newBtn;
+  document.getElementById('printNote').textContent = l.printNote;
+  document.getElementById('restoreText').textContent = l.savedSession;
+  document.getElementById('restoreBtn').textContent = l.continueBtn;
+  document.getElementById('discardBtn').textContent = l.discard;
+  document.getElementById('pinTitle').textContent = l.pinTitle;
+  document.getElementById('pinEnter').textContent = l.enter;
+  document.getElementById('pinCancel').textContent = l.cancel;
+  document.getElementById('planRefLabel').textContent = l.planRef;
+  document.getElementById('consultOnly').textContent = l.consultOnly;
+  // update vertical labels
+  Object.keys(V).forEach(k => {
+    const lbl = document.getElementById('vlbl_'+k);
+    if (lbl) lbl.textContent = V[k][lang].label;
+  });
+}
+
+// ── VERTICAL GRID ────────────────────────────────────────────────
+function buildVGrid() {
+  const grid = document.getElementById('vgrid');
+  grid.innerHTML = '';
+  Object.keys(V).forEach(k => {
+    const v = V[k];
+    const card = document.createElement('div');
+    card.className = 'vcard' + (clientData.vertical===k?' sel':'');
+    card.id = 'vcard_'+k;
+    card.onclick = () => selectVertical(k);
+    card.innerHTML = `
+      <img src="${VIMG[k]}" alt="${v[lang].label}" loading="lazy">
+      <div class="vcard-over"><div class="vcard-lbl" id="vlbl_${k}">${v[lang].label}</div></div>
+      <div class="vcheck"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M1 4l2 2 4-4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function selectVertical(k) {
+  clientData.vertical = k;
+  Object.keys(V).forEach(id => {
+    const c = document.getElementById('vcard_'+id);
+    if (c) c.classList.toggle('sel', id===k);
+  });
+  autoSave();
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────
+function goTo(s) {
+  ['setup','express','diagnostic','results'].forEach(id => {
+    const el = document.getElementById('stage'+id.charAt(0).toUpperCase()+id.slice(1));
+    if (el) el.classList.toggle('hidden', id!==s);
+  });
+  stage = s;
+  const prog = document.getElementById('progressBar');
+  prog.classList.toggle('hidden', s==='setup');
+  const idx = {express:0,diagnostic:1,results:2}[s] ?? -1;
+  [0,1,2].forEach(i => document.getElementById('p'+i).classList.toggle('on', i<=idx));
+  window.scrollTo(0,0);
+  autoSave();
+}
+
+// ── SETUP → EXPRESS ──────────────────────────────────────────────
+function startExpress() {
+  clientData.clientName = document.getElementById('clientName').value.trim();
+  clientData.bizName    = document.getElementById('bizName').value.trim();
+  clientData.date       = document.getElementById('sessionDate').value;
+  if (!clientData.clientName || !clientData.bizName || !clientData.vertical) {
+    alert(L[lang].fillAll); return;
+  }
+  buildExpressQs();
+  goTo('express');
+}
+
+function buildExpressQs() {
+  const l = L[lang];
+  const cont = document.getElementById('expressQs');
+  cont.innerHTML = '';
+  l.eqs.forEach((q,i) => {
+    const card = document.createElement('div');
+    card.className = 'qc' + (expAns[i]!==undefined?' done':'');
+    card.id = 'eq_'+i;
+    let optsHtml = l.opts.map((o,v) =>
+      `<label class="opt${expAns[i]===v?' sel':''}" id="eopt_${i}_${v}">
+        <input type="radio" name="eq${i}" value="${v}" ${expAns[i]===v?'checked':''} onchange="setExpAns(${i},${v})">
+        ${o}
+      </label>`
+    ).join('');
+    card.innerHTML = `
+      <div class="qmeta">${l.question} ${i+1} ${l.opts.length>0?'/ 7':''}</div>
+      <div class="qt">${q}</div>
+      <div class="opts">${optsHtml}</div>
+    `;
+    cont.appendChild(card);
+  });
+  updateExpCnt();
+}
+
+function setExpAns(i, v) {
+  expAns[i] = v;
+  const card = document.getElementById('eq_'+i);
+  if (card) card.classList.add('done');
+  L[lang].opts.forEach((_,ov) => {
+    const opt = document.getElementById(`eopt_${i}_${ov}`);
+    if (opt) opt.classList.toggle('sel', ov===v);
+  });
+  updateExpCnt();
+  autoSave();
+}
+
+function updateExpCnt() {
+  const n = Object.keys(expAns).length;
+  document.getElementById('cntExpress').textContent = `${n} / 7`;
+}
+
+function calcExpress() {
+  if (Object.keys(expAns).length !== 7) { alert(L[lang].fillAll); return; }
+  const l = L[lang];
+  const isEn = lang==='en';
+  let pc = null;
+  if (expAns[0]<2) pc = isEn?'Lack of operational control':'Falta de control operativo';
+  else if (expAns[2]<1||expAns[3]===3) pc = isEn?'Owner dependency':'Dependencia del dueño';
+  else if (expAns[4]<2) pc = isEn?'Unpredictable income':'Ingresos impredecibles';
+  const sc = [];
+  if (expAns[5]<2) sc.push(isEn?'Low client recurrence':'Baja recurrencia de clientes');
+  if (expAns[6]<2&&sc.length<2) sc.push(isEn?'No growth rules':'Sin reglas de crecimiento');
+  let hp = 'A';
+  if (pc&&(pc.toLowerCase().includes('depend')||pc.toLowerCase().includes('income')||pc.toLowerCase().includes('predic'))) hp='B';
+  else if (!pc) hp='C';
+  expResult = { pc: pc||(isEn?'No clear constraint detected':'Sin restricción clara detectada'), sc, hp };
+
+  document.getElementById('erTitle').textContent = expResult.pc;
+  document.getElementById('erSub').textContent = sc.length>0 ? `${l.alsoDetected} ${sc.join(' · ')}` : l.noSecondary;
+  document.getElementById('expressResult').classList.remove('hidden');
+
+  if (consultant) {
+    document.getElementById('consultExpress').classList.remove('hidden');
+    document.getElementById('consultExpressText').textContent = `${l.internalFocus}: Plan ${hp}`;
+  }
+  autoSave();
+}
+
+// ── EXPRESS → DIAGNOSTIC ─────────────────────────────────────────
+function buildDiagQs() {
+  const vd = V[clientData.vertical];
+  if (!vd) return;
+  const qs = vd.qs[lang];
+  const l  = L[lang];
+  const cont = document.getElementById('diagQs');
+  cont.innerHTML = '';
+  document.getElementById('shDiag').textContent = `${vd[lang].name} — 12 ${lang==='es'?'preguntas':'questions'}`;
+  qs.forEach((q,i) => {
+    const card = document.createElement('div');
+    card.className = 'qc' + (diagAns[i]!==undefined?' done':'');
+    card.id = 'dq_'+i;
+    let optsHtml = l.opts.map((o,v) =>
+      `<label class="opt${diagAns[i]===v?' sel':''}" id="dopt_${i}_${v}">
+        <input type="radio" name="dq${i}" value="${v}" ${diagAns[i]===v?'checked':''} onchange="setDiagAns(${i},${v})">
+        ${o}
+      </label>`
+    ).join('');
+    card.innerHTML = `
+      <div class="qmeta">${l.question} ${i+1} · ${l.weight} ${q.w}</div>
+      <div class="qt">${q.t}</div>
+      <div class="opts">${optsHtml}</div>
+    `;
+    cont.appendChild(card);
+  });
+  updateDiagCnt();
+}
+
+function setDiagAns(i, v) {
+  diagAns[i] = v;
+  const card = document.getElementById('dq_'+i);
+  if (card) card.classList.add('done');
+  L[lang].opts.forEach((_,ov) => {
+    const opt = document.getElementById(`dopt_${i}_${ov}`);
+    if (opt) opt.classList.toggle('sel', ov===v);
+  });
+  updateDiagCnt();
+  autoSave();
+}
+
+function updateDiagCnt() {
+  document.getElementById('cntDiag').textContent = `${Object.keys(diagAns).length} / 12`;
+}
+
+function calcDiag() {
+  if (Object.keys(diagAns).length !== 12) { alert(L[lang].fillAll); return; }
+  const vd = V[clientData.vertical];
+  const qs = vd.qs.es;
+  let s=0, m=0;
+  qs.forEach((q,i) => { s += (diagAns[i]||0)*q.w; m += 3*q.w; });
+  const p = Math.round((s/m)*100);
+  let pl = 'A';
+  if (p>35) pl='B'; if (p>65) pl='C'; if (p>85) pl='D';
+  let forced = false;
+  if ((diagAns[vd.agendaQ-1]||0)<2) { pl='A'; forced=true; }
+  diagResult = { s, m, p, pl, forced };
+  renderResults();
+  goTo('results');
+}
+
+// ── RESULTS ──────────────────────────────────────────────────────
+function renderResults() {
+  const dr = diagResult, l = L[lang];
+  const vd = V[clientData.vertical];
+  const vc = vd.c[lang][dr.pl];
+  const plans = PLANS(l);
+  const plan = plans[dr.pl];
+  const col = PCOL[dr.pl];
+
+  document.getElementById('resImg').src = VIMG[clientData.vertical];
+  document.getElementById('resBiz').textContent = clientData.bizName;
+  document.getElementById('resSub').textContent = `${vd[lang].name} · ${clientData.date}`;
+  document.getElementById('valPts').textContent = dr.s;
+  document.getElementById('valMax').textContent = dr.m;
+  document.getElementById('valPct').textContent = dr.p+'%';
+  setTimeout(() => { document.getElementById('barFill').style.width = dr.p+'%'; }, 100);
+
+  const chip = document.getElementById('stageChip');
+  chip.textContent = consultant ? plan.n : plan.cl;
+  chip.style.cssText = `background:${col}15;color:${col};border:1px solid ${col}35`;
+
+  const fw = document.getElementById('forcedWarning');
+  if (dr.forced) { fw.textContent = l.agendaCrit; fw.classList.remove('hidden'); }
+  else fw.classList.add('hidden');
+
+  document.getElementById('cbox').style.cssText = `background:var(--bg-card2);border-left:3px solid ${col}`;
+  document.getElementById('cSub').textContent = `${l.primaryC} · ${vd[lang].name}`;
+  document.getElementById('cTitle').textContent = vc.l;
+  document.getElementById('cAction').textContent = vc.a;
+  document.getElementById('cTool').innerHTML = `${l.toolLabel}: <span>${vc.t}</span>`;
+
+  const stepsBlock = document.getElementById('stepsBlock');
+  stepsBlock.innerHTML = [vc.a, l.step2, l.step3].map((s,i) =>
+    `<div class="stp"><div class="snum">${i+1}</div><div class="stxt">${s}</div></div>`
+  ).join('');
+
+  if (consultant) {
+    document.getElementById('consultResults').classList.remove('hidden');
+    document.getElementById('consultResultsLabel').textContent = l.consultOnly;
+    document.getElementById('consultFocusLabel').textContent = l.internalFocus;
+    document.getElementById('consultFocus').textContent = plan.f;
+    document.getElementById('consultPills').innerHTML =
+      plan.allowed.map(o=>`<span class="pill pill-ok">✓ ${o}</span>`).join('') +
+      plan.blocked.map(o=>`<span class="pill pill-no">✗ ${o}</span>`).join('');
+  }
+}
+
+// ── DOWNLOAD REPORT ──────────────────────────────────────────────
+function downloadReport() {
+  if (!diagResult) return;
+  const dr = diagResult, l = L[lang];
+  const vd = V[clientData.vertical];
+  const vc = vd.c[lang][dr.pl];
+  const plans = PLANS(l), plan = plans[dr.pl];
+  const col = PCOL[dr.pl], img = VIMG[clientData.vertical];
+  const dateStr = new Date(clientData.date).toLocaleDateString(lang==='es'?'es-US':'en-US',{year:'numeric',month:'long',day:'numeric'});
+
+  const html = `<!DOCTYPE html><html lang="${lang}"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NextVia Labs — ${clientData.bizName}</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:#F4F6FF;color:#0D0D2B;line-height:1.6}:root{--grad:linear-gradient(135deg,#00C2FF 0%,#7B2FF7 50%,#FF1A8C 100%);--grad-t:linear-gradient(135deg,#0088BB 0%,#6B1FD7 50%,#BB005A 100%)}.page{max-width:760px;margin:0 auto;background:#fff;box-shadow:0 4px 40px rgba(0,0,0,.1)}.hero{position:relative;height:200px;overflow:hidden}.hero img{width:100%;height:100%;object-fit:cover;filter:brightness(.28);display:block}.hero-over{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,194,255,.15) 0%,rgba(123,47,247,.35) 50%,rgba(255,26,140,.15) 100%)}.hero-c{position:absolute;inset:0;padding:1.75rem 2.5rem;display:flex;flex-direction:column;justify-content:space-between}.logo-r{display:flex;align-items:center;gap:.6rem}.dot{width:8px;height:8px;border-radius:50%;background:var(--grad);flex-shrink:0}.logo-n{font-size:17px;font-weight:900;color:#fff;letter-spacing:-.3px}.logo-s{font-size:9px;color:rgba(255,255,255,.55);letter-spacing:.4px;margin-top:1px}.cli-n{font-size:28px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.15}.cli-b{font-size:13px;color:rgba(255,255,255,.62);margin-top:.2rem}.tags{display:flex;gap:.45rem;margin-top:.65rem}.tag{display:inline-block;padding:.18rem .65rem;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}.tag-g{background:rgba(255,255,255,.1);color:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.18)}.body{padding:2rem 2.5rem}.s-tag{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;background:var(--grad-t);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;margin-bottom:.75rem}.score-wrap{background:#F4F6FF;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:1.35rem 1.75rem;margin-bottom:1.5rem;display:grid;grid-template-columns:auto 1fr;gap:1.75rem;align-items:center}.s-big{font-size:66px;font-weight:900;letter-spacing:-3px;background:var(--grad-t);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}.s-lbl{font-size:9px;color:#5C5C82;letter-spacing:.4px;text-transform:uppercase;margin-top:.18rem;font-weight:700}.bar-bg{height:5px;background:#ECEEFF;border-radius:3px;margin:.5rem 0 .75rem;overflow:hidden}.bar-fill{height:100%;border-radius:3px;background:var(--grad)}.chip{display:inline-block;padding:.24rem .8rem;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.3px}.cblock{border-left:3px solid ${col};padding:1.1rem 1.35rem;background:#F4F6FF;border-radius:0 10px 10px 0;margin-bottom:1.5rem}.c-mic{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#5C5C82;margin-bottom:.32rem}.c-h{font-size:22px;font-weight:900;color:#0D0D2B;letter-spacing:-.4px;line-height:1.22;margin-bottom:.5rem}.c-b{font-size:13px;color:#5C5C82;line-height:1.6;margin-bottom:.4rem;font-weight:500}.c-t{font-size:11px;color:#5C5C82;font-weight:600}.c-t b{color:#7B2FF7}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem}.stat{background:#F4F6FF;border:1px solid rgba(0,0,0,.07);border-radius:10px;padding:.85rem 1rem}.stat-l{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5C5C82;margin-bottom:.25rem}.stat-v{font-size:22px;font-weight:900;letter-spacing:-1px;color:#0D0D2B}.pills{margin-bottom:1.5rem}.pill{display:inline-block;padding:.18rem .55rem;border-radius:20px;font-size:9px;font-weight:700;margin:.15rem .08rem 0 0;letter-spacing:.3px}.pill-ok{background:rgba(0,200,122,.1);color:#00C87A;border:1px solid rgba(0,200,122,.22)}.pill-no{background:rgba(255,85,85,.08);color:#FF5555;border:1px solid rgba(255,85,85,.18)}.steps{background:#0D0D2B;border-radius:14px;padding:1.35rem 1.75rem;margin-bottom:1.5rem}.step{display:flex;gap:.9rem;margin-bottom:.9rem;align-items:flex-start}.step:last-child{margin-bottom:0}.sn{width:24px;height:24px;border-radius:50%;background:var(--grad);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}.st{font-size:12px;color:rgba(244,246,255,.8);line-height:1.6;font-weight:500}.footer{background:#0D0D2B;padding:1.25rem 2.5rem;display:flex;justify-content:space-between;align-items:center}.f-n{font-size:15px;font-weight:900;color:#fff;letter-spacing:-.3px}.f-t{font-size:9px;color:#5C5C82;margin-top:2px;letter-spacing:.3px}.f-r{font-size:9px;color:#5C5C82;text-align:right;line-height:1.8}@media print{body{background:#fff}.page{max-width:100%;box-shadow:none}}</style></head><body><div class="page"><div class="hero"><img src="${img}" alt="${vd[lang].name}"><div class="hero-over"></div><div class="hero-c"><div class="logo-r"><div class="dot"></div><div><div class="logo-n">NextVia Labs</div><div class="logo-s">${l.shScore}</div></div></div><div><div class="cli-n">${clientData.clientName}</div><div class="cli-b">${clientData.bizName}</div><div class="tags"><span class="tag tag-g">${vd[lang].name}</span><span class="tag tag-g">${dateStr}</span><span class="tag tag-g" style="background:${col}25;color:${col};border-color:${col}40">${plan.cl}</span></div></div></div></div><div class="body"><span class="s-tag">${l.shScore}</span><div class="score-wrap"><div><div class="s-big">${dr.p}%</div><div class="s-lbl">${lang==='es'?'Nivel operativo':'Operative level'}</div></div><div><div class="bar-bg"><div class="bar-fill" style="width:${dr.p}%"></div></div><span class="chip" style="background:${col}15;color:${col};border:1px solid ${col}38">${plan.cl}</span>${dr.forced?`<span style="font-size:10px;color:#F59E0B;margin-left:.65rem;font-weight:700">${l.agendaCrit}</span>`:''}</div></div><span class="s-tag">${l.shConstraint}</span><div class="cblock"><div class="c-mic">${l.primaryC} · ${vd[lang].name}</div><div class="c-h">${vc.l}</div><div class="c-b">${vc.a}</div><div class="c-t">${l.toolLabel}: <b>${vc.t}</b></div></div><div class="stats"><div class="stat"><div class="stat-l">${l.lblPts}</div><div class="stat-v">${dr.s}</div></div><div class="stat"><div class="stat-l">${l.lblMax}</div><div class="stat-v">${dr.m}</div></div><div class="stat"><div class="stat-l">${l.lblLvl}</div><div class="stat-v">${dr.p}%</div></div></div><span class="s-tag">${lang==='es'?'Servicios Habilitados':'Enabled Services'}</span><div class="pills">${plan.allowed.map(o=>`<span class="pill pill-ok">✓ ${o}</span>`).join('')}${plan.blocked.map(o=>`<span class="pill pill-no">✗ ${o}</span>`).join('')}</div><span class="s-tag">${l.shSteps}</span><div class="steps">${[vc.a,l.step2,l.step3].map((s,i)=>`<div class="step"><div class="sn">${i+1}</div><div class="st">${s}</div></div>`).join('')}</div></div><div class="footer"><div><div class="f-n">NextVia Labs</div><div class="f-t">${lang==='es'?'Encontramos la falla. La resolvemos.':'We find the break. We fix it.'}</div></div><div class="f-r">Charlotte, NC · nextvialabs.com<br>${lang==='es'?'Generado el':'Generated on'} ${dateStr}</div></div></div></body></html>`;
+
+  const blob = new Blob([html], {type:'text/html'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `NVL_${clientData.bizName.replace(/\s+/g,'_')}_${clientData.date}.html`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ── CONSULTANT ───────────────────────────────────────────────────
+function toggleLock() {
+  if (consultant) {
+    consultant = false;
+    document.getElementById('lockBtn').classList.remove('on');
+    document.getElementById('lockBtn').textContent = '🔒';
+    document.getElementById('consultPanel').classList.add('hidden');
+    document.getElementById('consultExpress').classList.add('hidden');
+    document.getElementById('consultResults').classList.add('hidden');
+  } else {
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinModal').classList.remove('hidden');
+    setTimeout(() => document.getElementById('pinInput').focus(), 100);
+  }
+}
+function checkPin() {}
+function submitPin() {
+  const p = document.getElementById('pinInput').value;
+  if (p === PIN) {
+    consultant = true;
+    document.getElementById('pinModal').classList.add('hidden');
+    document.getElementById('lockBtn').classList.add('on');
+    document.getElementById('lockBtn').textContent = '🔓';
+    document.getElementById('consultPanel').classList.remove('hidden');
+    buildPlanRefGrid();
+    if (stage==='results') renderResults();
+  } else {
+    alert(L[lang].pinWrong);
+    document.getElementById('pinInput').value = '';
+  }
+}
+function closePin() {
+  document.getElementById('pinModal').classList.add('hidden');
+  document.getElementById('pinInput').value = '';
+}
+
+function togglePlanRef() {
+  showRef = !showRef;
+  document.getElementById('planRefGrid').classList.toggle('hidden', !showRef);
+  document.getElementById('planRefArrow').textContent = showRef ? '▲' : '▼';
+}
+function buildPlanRefGrid() {
+  const grid = document.getElementById('planRefGrid');
+  const plans = PLANS(L[lang]);
+  grid.innerHTML = Object.entries(plans).map(([k,p]) =>
+    `<div class="pcard" style="border-left:2px solid ${PCOL[k]}">
+      <p style="font-size:10px;font-weight:700;color:${PCOL[k]};margin-bottom:.14rem">${p.n}</p>
+      <p style="font-size:9px;color:var(--muted);margin-bottom:.24rem">${p.f}</p>
+      <p style="font-size:9px;color:var(--green);font-weight:600">✓ ${p.allowed.join(' · ')}</p>
+      ${p.blocked.length?`<p style="font-size:9px;color:var(--red);font-weight:600">✗ ${p.blocked.join(' · ')}</p>`:''}
+    </div>`
+  ).join('');
+}
+
+// ── RESET ────────────────────────────────────────────────────────
+function confirmReset() {
+  if (confirm(L[lang].confirmRestart)) hardReset();
+}
+function hardReset() {
+  expAns={}; expResult=null; diagAns={}; diagResult=null;
+  clientData={clientName:'',bizName:'',vertical:'',date:todayStr()};
+  document.getElementById('clientName').value='';
+  document.getElementById('bizName').value='';
+  document.getElementById('sessionDate').value=todayStr();
+  document.getElementById('expressResult').classList.add('hidden');
+  buildVGrid();
+  try { localStorage.removeItem(SK); } catch(_){}
+  goTo('setup');
+}
+
+// ── AUTOSAVE / RESTORE ───────────────────────────────────────────
+function autoSave() {
+  try {
+    localStorage.setItem(SK, JSON.stringify({lang,stage,clientData,expAns,expResult,diagAns,diagResult}));
+  } catch(_) {}
+}
+function checkRestore() {
+  try {
+    const d = JSON.parse(localStorage.getItem(SK)||'null');
+    if (d && d.stage && d.stage!=='setup') {
+      document.getElementById('restoreBanner').classList.remove('hidden');
+    }
+  } catch(_) {}
+}
+function restoreSession() {
+  try {
+    const d = JSON.parse(localStorage.getItem(SK)||'null');
+    if (!d) return;
+    lang=d.lang||'es'; stage=d.stage||'setup';
+    clientData=d.clientData||{clientName:'',bizName:'',vertical:'',date:todayStr()};
+    expAns=d.expAns||{}; expResult=d.expResult||null;
+    diagAns=d.diagAns||{}; diagResult=d.diagResult||null;
+    document.getElementById('clientName').value=clientData.clientName||'';
+    document.getElementById('bizName').value=clientData.bizName||'';
+    document.getElementById('sessionDate').value=clientData.date||todayStr();
+    setLang(lang);
+    buildVGrid();
+    document.getElementById('restoreBanner').classList.add('hidden');
+    if (stage==='express') { buildExpressQs(); goTo('express'); }
+    else if (stage==='diagnostic') { buildExpressQs(); buildDiagQs(); goTo('diagnostic'); }
+    else if (stage==='results' && diagResult) { buildDiagQs(); renderResults(); goTo('results'); }
+    else goTo('setup');
+  } catch(_) { goTo('setup'); }
+}
+function discardSession() {
+  try { localStorage.removeItem(SK); } catch(_){}
+  document.getElementById('restoreBanner').classList.add('hidden');
+}
+</script>
+</body>
+</html>
